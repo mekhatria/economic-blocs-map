@@ -11,6 +11,9 @@ import { Chart, setHighcharts } from '@highcharts/react';
 // Register Highcharts instance for the React wrapper (needed for maps/constructorType)
 setHighcharts(Highcharts);
 
+// Local world topojson as a fallback/default
+import worldMap from '@highcharts/map-collection/custom/world.topo.json';
+
 // Import our economic blocs data
 import { economicBlocs } from './economicBlocs';
 
@@ -18,8 +21,8 @@ import StatCard from './components/StatCard';
 
 function App() {
   // useState creates a state variable 'mapData' and a function 'setMapData' to update it
-  // Initial value is null (no map data loaded yet)
-  const [mapData, setMapData] = useState(null);
+  // Seed with local topojson so the map renders even if the CDN is blocked
+  const [mapData, setMapData] = useState(worldMap);
   
   // State to track which bloc is selected - starts with null (none selected)
   const [selectedBloc, setSelectedBloc] = useState(null);
@@ -33,10 +36,14 @@ function App() {
   // useEffect runs after the component renders
   // The empty array [] means it only runs once when component first mounts
   useEffect(() => {
-    // Fetch the world map topology data from Highcharts CDN
+    // Fetch the world map topology data from Highcharts CDN (best-effort)
     fetch('https://code.highcharts.com/mapdata/custom/world.topo.json')
       .then(response => response.json()) // Convert response to JSON
-      .then(data => setMapData(data)); // Store the map data in state
+      .then(data => setMapData(data)) // Store the map data in state
+      .catch(() => {
+        // Keep fallback mapData if fetch fails
+        setMapData(worldMap);
+      });
   }, []); // Empty dependency array = run only once
   
   // Close dropdown when clicking outside
@@ -102,6 +109,8 @@ function App() {
       visible: false // Hide the color axis legend
     },
     series: [{
+      type: 'map', // Explicit map series for the new wrapper
+      mapData, // Attach map topology here (in addition to chart.map)
       name: 'Countries', // Series name (shows in tooltip/legend)
       data: seriesData, // Memoized array of countries in the selected bloc
       joinBy: 'hc-key', // Match data to map using ISO country codes
