@@ -255,7 +255,7 @@ function App() {
 
       <div style={{ maxWidth: '800px', margin: '20px auto', padding: '0 20px' }}>
         <Chart
-          constructorType={'mapChart'} // Tell it to create a map, not a regular chart
+          chartConstructor="mapChart" // Use mapChart constructor in new wrapper
           options={mapOptions} // Pass our configuration
         />
       </div>
