@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 
 // Import Highcharts core and map module, then register with the new React wrapper
 import Highcharts from 'highcharts';
-import mapModule from 'highcharts/modules/map';
+import mapModule from 'highcharts/modules/map.js';
 import { Chart, setHighcharts } from '@highcharts/react';
 
 // Initialize the map module on the Highcharts instance (module export can vary)
