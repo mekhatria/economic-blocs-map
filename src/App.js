@@ -17,6 +17,11 @@ import { economicBlocs } from './economicBlocs';
 
 import StatCard from './components/StatCard';
 
+// Register the bundled world map under a key so Highcharts can resolve it immediately
+Highcharts.maps = Highcharts.maps || {};
+Highcharts.maps['custom/world'] = worldMap;
+const mapKey = 'custom/world';
+
 // Initialize the map module on the Highcharts instance (module export can vary)
 const mapFactory = mapModule && (mapModule.default || mapModule);
 if (typeof mapFactory === 'function') {
@@ -86,7 +91,8 @@ function App() {
   // Configuration object for Highcharts map; memoized to reduce unnecessary re-renders
   const mapOptions = useMemo(() => ({
     chart: {
-      map: mapData, // Assign the fetched map topology data
+      // Prefer fetched mapData when available, otherwise fallback to registered key
+      map: mapData || mapKey,
       backgroundColor: '#1a1a1a'
     },
     title: {
