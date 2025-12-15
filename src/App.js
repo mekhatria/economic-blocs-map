@@ -4,10 +4,16 @@ import './App.css';
 // Import React hooks - useState manages component state, useEffect handles side effects like data fetching
 import { useState, useEffect, useRef, useMemo } from 'react';
 
-// Import Highcharts Maps and register it with the new React wrapper
-import Highcharts from 'highcharts/highmaps';
+// Import Highcharts core and map module, then register with the new React wrapper
+import Highcharts from 'highcharts';
+import mapModule from 'highcharts/modules/map';
 import { Chart, setHighcharts } from '@highcharts/react';
 
+// Initialize the map module on the Highcharts instance (module export can vary)
+const mapFactory = mapModule && (mapModule.default || mapModule);
+if (typeof mapFactory === 'function') {
+  mapFactory(Highcharts);
+}
 // Register Highcharts instance for the React wrapper (needed for maps/constructorType)
 setHighcharts(Highcharts);
 
