@@ -5,6 +5,7 @@ import BlocInfo from './components/BlocInfo';
 import MapChart from './components/MapChart';
 import { economicBlocs } from './economicBlocs';
 import { useMapData } from './hooks/useMapData';
+import { Highcharts } from './lib/highchartsSetup';
 import './lib/highchartsSetup';
 
 function App() {
@@ -20,13 +21,24 @@ function App() {
   );
 
   const seriesData = useMemo(() => {
-    if (!selectedBloc) return [];
+    if (!mapData) return [];
 
-    return economicBlocs[selectedBloc].countries.map((code) => ({
-      'hc-key': code.toLowerCase(),
-      value: 1
-    }));
-  }, [selectedBloc]);
+    const geojson = Highcharts.geojson(mapData);
+    const selectedSet = new Set(
+      selectedBloc ? economicBlocs[selectedBloc].countries.map((code) => code.toLowerCase()) : []
+    );
+
+    return geojson.map((feature) => {
+      const key =
+        (feature.properties && (feature.properties['hc-key'] || feature.properties['iso-a2'])) || '';
+      const normalizedKey = key.toLowerCase();
+
+      return {
+        'hc-key': normalizedKey,
+        value: selectedSet.has(normalizedKey) ? 1 : 0
+      };
+    });
+  }, [mapData, selectedBloc]);
 
   return (
     <div className="App" style={{ backgroundColor: '#000000', minHeight: '100vh', padding: '20px' }}>
